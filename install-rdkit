@@ -228,7 +228,7 @@ function print_help
 		    variables.
 		
 		    export RDBASE=/path/to/install/dir
-		    export LD_LIBRARY_PATH=$RDBASE/lib:\$LD_LIBRARY_PATH
+		    export LD_LIBRARY_PATH=\$RDBASE/lib:\$LD_LIBRARY_PATH
 		    export PYTHONPATH=\$RDBASE:\$PYTHONPATH
 		
 		OPTIONS
