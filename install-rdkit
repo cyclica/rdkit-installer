@@ -231,9 +231,15 @@ function print_help
 		    If your INSTALL_DIR is /path/to/install/dir, set the following environment
 		    variables.
 		
-		    export RDBASE=/path/to/install/dir
-		    export LD_LIBRARY_PATH=\$RDBASE/lib:\$LD_LIBRARY_PATH
-		    export PYTHONPATH=\$RDBASE:\$PYTHONPATH
+		    Note that RDKit will function if you do not export RDBASE, but it
+		    will be operating in a fallback mode and may have issues.
+		
+		    RDBASE=/path/to/install/dir
+		    export RDBASE
+		    LD_LIBRARY_PATH=\$RDBASE/lib:\$LD_LIBRARY_PATH
+		    export LD_LIBRARY_PATH
+		    PYTHONPATH=\$RDBASE:\$PYTHONPATH
+		    export PYTHONPATH
 		
 		OPTIONS
 		    -r, --release
