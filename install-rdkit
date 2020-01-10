@@ -258,11 +258,11 @@ function print_help
 		        installation of RDKit in. If you have a virtual environment
 		        activated it will default to that. It will ensure the virtual
 		        environment has numpy installed.
-
+		
 		    --postgres-extension
 		        Build RDKit with optional postgres cartridge. (Must have
-			postgresql-server-dev installed PostgreSQL_ROOT environment
-			variable set.)
+		        postgresql-server-dev installed PostgreSQL_ROOT environment
+		        variable set.)
 		
 		    -d, --debug
 		        Print debugging output while running.
@@ -308,7 +308,7 @@ function parse_opts
     #   LONGOPTS=source:,debug,test
     #
     OPTIONS=r:p:e:dh
-    LONGOPTS=release:,python-version:,virtual-env:,debug,help,postgres-extension
+    LONGOPTS=release:,python-version:,virtual-env:,postgres-extension,debug,help
 
     # Use ! and PIPESTATUS to get exit code with errexit set.
     # Temporarily store output to be able to check for errors.
@@ -351,10 +351,10 @@ function parse_opts
                 venv="${2}"
                 shift 2
                 ;;
-	    --postgres-extension)
-		postgres_ext="ON"
-		shift
-		;;
+            --postgres-extension)
+                postgres_ext="ON"
+                shift
+                ;;
             -d|--debug)
                 DEBUG=true
                 shift
@@ -376,7 +376,7 @@ function parse_opts
 
     if [ -z "${postgres_ext}" ]
     then
-	    postgres_ext="OFF"
+        postgres_ext="OFF"
     fi
 
     if [ -z "${1}" ]
