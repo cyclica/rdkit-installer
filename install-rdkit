@@ -320,6 +320,11 @@ function print_help
 		        sudo ./build/Code/PgSQL/rdkit/pgsql_install.sh
 		        sudo service postgresql start
 		
+		    -c WHEN, --color=WHEN
+		        Colorize the output. WHEN can be 'always', 'auto' (default if
+		        omitted), or 'never'. With 'auto' it emits color codes only
+		        when standard output is connected to a terminal.
+		
 		    -d, --debug
 		        Print debugging output while running.
 		
@@ -367,8 +372,8 @@ function parse_opts
     #   OPTIONS=s:dt
     #   LONGOPTS=source:,debug,test
     #
-    OPTIONS=r:p:e:dh
-    LONGOPTS=release:,python-version:,virtual-env:,postgresql-root:,debug,help
+    OPTIONS=c:r:p:e:dh
+    LONGOPTS=color:release:,python-version:,virtual-env:,postgresql-root:,debug,help
 
     # Use ! and PIPESTATUS to get exit code with errexit set.
     # Temporarily store output to be able to check for errors.
@@ -385,6 +390,8 @@ function parse_opts
     eval set -- "$PARSED"
 
     # Set defaults here or earlier, if any.
+
+    local input_color_option
 
     #
     # Now enjoy the options in order and nicely split until we see --
@@ -415,6 +422,10 @@ function parse_opts
                 postgresql_root="${2}"
                 shift 2
                 ;;
+            -c|--color)
+                input_color_option="$2"
+                shift 2
+                ;;
             -d|--debug)
                 DEBUG=true
                 shift
@@ -433,6 +444,31 @@ function parse_opts
                 ;;
         esac
     done
+
+
+    case "${input_color_option}" in
+        always|yes|force)
+            color_option=always
+            ;;
+        never|no|none)
+            color_option=never
+            ;;
+        auto|tty|if-tty)
+            # Defaults to this if unset.
+            color_option=auto
+            ;;
+        '')
+            # Let the color function choose the default.
+            ;;
+        *)
+            alarm "Invalid value ${input_color_option} for --color."
+            echo
+            print_help
+            # "command line usage error" in /usr/include/sysexits.h.
+            exit 64
+            ;;
+    esac
+
 
     if [ -z "${1}" ]
     then
@@ -464,18 +500,67 @@ bool() ([ -z "${2+x}" ] && [[ $1 == true ]])
 
 
 #
+# Returns success (0) if colour should be output and failure (1) otherwise.
+#
+# Usage:
+#
+#   if color; then …; fi
+#
+# Defaults to 'auto' if global $color_option is unset or an empty string.
+#
+# Exits with an error message if global $color_option is an invalid value.
+#
+function color
+{
+    case "${color_option}" in
+        always)
+            return 0
+            ;;
+        never)
+            return 1
+            ;;
+        auto|'')
+            # Output color when stdout is a terminal.
+            if [ -t 1 ]
+            then
+                # stdout is a terminal. Use color output.
+                return 0
+            else
+                # stdout is not a terminal. Do not use color output.
+                return 1
+            fi
+            ;;
+        *)
+            set_color_option="${color_option}"
+            # Set a valid color_option so we can output our error message.
+            color_option=auto
+            die "Internal software error: Invalid color_option: ${set_color_option}." 70
+            ;;
+    esac
+}
+
+
+#
 # warn - print warning message
 #
 # $1 - message
 #
 function warn
 {
-    # print to regular output in regular orange
-    printf "\e[0;33m"
-    # Print the message with `echo` to prevent anything in the string from
-    # being interpreted as formatting characters.
+    if color
+    then
+        # print to regular output in regular orange
+        printf "\033[0;33m"
+    fi
+
+    # Print the message with regular `echo` to prevent anything in the string
+    # from being interpreted as formatting characters.
     echo "${1}"
-    printf "\e[m"
+
+    if color
+    then
+        printf "\033[m"
+    fi
 }
 
 
@@ -486,12 +571,20 @@ function warn
 #
 function alarm
 {
-    # print to error output in bold red
-    printf "\e[1;31m" >&2
-    # Print the message with `echo` to prevent anything in the string from
-    # being interpreted as formatting characters.
+    if color
+    then
+        # print to error output in bold red
+        printf "\033[1;31m" >&2
+    fi
+
+    # Print the message with regular `echo` to prevent anything in the string
+    # from being interpreted as formatting characters.
     echo "${1}" >&2
-    printf "\e[m" >&2
+
+    if color
+    then
+        printf "\033[m" >&2
+    fi
 }
 
 
