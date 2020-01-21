@@ -373,7 +373,7 @@ function parse_opts
     #   LONGOPTS=source:,debug,test
     #
     OPTIONS=c:r:p:e:dh
-    LONGOPTS=color:release:,python-version:,virtual-env:,postgresql-root:,debug,help
+    LONGOPTS=color:,release:,python-version:,virtual-env:,postgresql-root:,debug,help
 
     # Use ! and PIPESTATUS to get exit code with errexit set.
     # Temporarily store output to be able to check for errors.
