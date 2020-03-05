@@ -36,6 +36,8 @@ function main
             ;;
         3.7)
             ;;
+        3.8)
+            ;;
         *)
             die "ERROR: Invalid or unsupported Python version: ${python_version}"
             ;;
@@ -135,6 +137,14 @@ function main
     check_err $? 'Could not install required system packages.'
 
     case "${python_version}" in
+        3.8)
+            debug "Installing Python ${python_version} packages..."
+            sudo apt-get install -y \
+                python3.8 python3.8-dev python3-apt python3-numpy \
+                python3-scipy python3-matplotlib python3-pandas python3-sympy \
+                python3-nose
+            check_err $? 'Could not install required system packages.'
+            ;;
         3.7)
             debug "Installing Python ${python_version} packages..."
             sudo apt-get install -y \
@@ -198,6 +208,20 @@ function main
     debug "Current directory for build: ${PWD}"
 
     case "${python_version}" in
+        3.8)
+            debug "Running cmake for Python ${python_version}..."
+            debug "numpy_cmake_option: $numpy_cmake_option"
+            # Based on the advanced install instructions in the RDKit online
+            # docs with paths changed to match Ubuntu Linux file locations:
+            # https://www.rdkit.org/docs/Install.html#advanced
+            cmake -D PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.8.so \
+                -D PYTHON_INCLUDE_DIR=/usr/include/python3.8 \
+                -D PYTHON_EXECUTABLE=/usr/bin/python3.8 \
+                $numpy_cmake_option \
+                -D RDK_BUILD_INCHI_SUPPORT=ON \
+                -D RDK_BUILD_PGSQL="${build_psql}" \
+                -D PostgreSQL_ROOT="${postgresql_root}" ..
+            ;;
         3.7)
             debug "Running cmake for Python ${python_version}..."
             debug "numpy_cmake_option: $numpy_cmake_option"
@@ -326,7 +350,7 @@ function print_help
 		
 		    -p, --python-version
 		        Version of Python to build for. Defaults to 3.6. Currently
-		        supports 2.7, 3.6, and 3.7.
+		        supports 2.7, 3.6, 3.7, and 3.8.
 		
 		    -e, --virtual-env
 		        Path to the Python virtual environment you want to run this
