@@ -30,13 +30,7 @@ function main
     fi
 
     case "${python_version}" in
-        2.7)
-            ;;
-        3.6)
-            ;;
-        3.7)
-            ;;
-        3.8)
+        2.7|3.6|3.7|3.8)
             ;;
         *)
             die "ERROR: Invalid or unsupported Python version: ${python_version}"
@@ -91,16 +85,22 @@ function main
         numpy_cmake_option="-D PYTHON_NUMPY_INCLUDE_PATH='${venv}/lib/python${python_version}/site-packages/numpy/core/include'"
     fi
 
-    if [ -z "${postgresql_root}" ]
+    build_psql='OFF'
+    if [ ! -z "${postgresql_version}" ]
     then
-        build_psql='OFF'
-    else
-        if [ ! -d "${postgresql_root}" ]
+        build_psql='ON'
+
+        if [ -z "${postgresql_root}" ]
         then
-            die "ERROR: Invalid --postgresql-root. Directory ${postgresql_root} does not exist."
+            postgresql_root="/usr/lib/postgresql/${postgresql_version}"
         fi
 
-        build_psql='ON'
+        if [ ! -d "${postgresql_root}" ]
+        then
+            alarm "ERROR: Invalid PostgreSQL root. Directory ${postgresql_root} does not exist."
+            alarm "Either --postgresql-version or --postgresql-root option is incorrect."
+            die "Make sure you have the correct PostgreSQL version installed in the correct location."
+        fi
     fi
 
     if [ ! -d "${install_dir}" ]
@@ -130,9 +130,9 @@ function main
         openbabel libboost-iostreams-dev
     check_err $? 'Could not install required system packages.'
 
-    if [ ! -z "${postgresql_root}" ]
+    if [[ $build_psql == ON ]]
     then
-        sudo apt-get install -y postgresql-server-dev-all
+        sudo apt-get install -y postgresql-server-dev-${postgresql_version}
     fi
     check_err $? 'Could not install required system packages.'
 
@@ -261,7 +261,7 @@ function main
     make -j $cpu_cores
     make install
 
-    if [ ! -z "${postgresql_root}" ]
+    if [[ $build_psql == ON ]]
     then
         # Make sure the built RDKit cartidge files are readable by all so that
         # they will be readable when the install script copies them into their
@@ -270,7 +270,7 @@ function main
         # Extract the filenames from the installer.
         for file in $(grep -E '^cp ' "${install_dir}"/build/Code/PgSQL/rdkit/pgsql_install.sh | cut -d' ' -f 2 | tr -d '"')
         do
-            chmod o=r "${file}"
+            chmod u+r,g+r,o=r "${file}"
         done
 
         # Modify the installer to make sure these permissions are preserved
@@ -358,15 +358,23 @@ function print_help
 		        activated it will default to that. It will ensure the virtual
 		        environment has numpy installed.
 		
-		    --postgresql-root
-		        Set this to the location where PostgreSQL is installed on your
-		        system and install-rdkit will build RDKit with the optional
-		        postgres cartridge. Once RDKit is built run the following to
-		        install the cartridge.
+		    --postgresql-version
+		        Set this to the major version of PostgreSQL you have installed
+		        and install-rdkit will build RDKit with the optional Postgres
+		        cartridge. As of early 2020 valid versions are 9.4, 9.5, 9.6,
+		        10, 11, 12.
+		
+		        Once RDKit is built run the following to install the cartridge.
 		
 		        sudo service postgresql stop
 		        sudo ./build/Code/PgSQL/rdkit/pgsql_install.sh
 		        sudo service postgresql start
+		
+		    --postgresql-root
+		        Set this to specify the root directory your system’s PostgreSQL
+		        installation can be found in. This is only used if
+		        --postgresql-version is specified. Defaults to
+		        /usr/lib/postgresql/POSTGRESQL_VERSION.
 		
 		    -c WHEN, --color=WHEN
 		        Colorize the output. WHEN can be 'always', 'auto' (default if
@@ -391,7 +399,12 @@ function print_help
 		
 		    # Download and compile Release_2018_09_1 in /path/to/install/dir
 		    # with PostgreSQL cartridge built for PostgreSQL 10 on Ubuntu.
-		    install-rdkit --postgresql-root=/usr/lib/postgresql/10 /path/to/install/dir
+		    install-rdkit --postgresql-version=10 /path/to/install/dir
+		
+		    # Download and compile Release_2018_09_1 in /path/to/install/dir
+		    # with PostgreSQL cartridge built for PostgreSQL 10 with custom
+		    # PostgreSQL dir.
+		    install-rdkit --postgresql-version=10 --postgresql-root=/postgresql-10 /path/to/install/dir
 	EOF
 }
 
@@ -421,7 +434,7 @@ function parse_opts
     #   LONGOPTS=source:,debug,test
     #
     OPTIONS=c:r:p:e:dh
-    LONGOPTS=color:,release:,python-version:,virtual-env:,postgresql-root:,debug,help
+    LONGOPTS=color:,release:,python-version:,virtual-env:,postgresql-version:,postgresql-root:,debug,help
 
     # Use ! and PIPESTATUS to get exit code with errexit set.
     # Temporarily store output to be able to check for errors.
@@ -464,6 +477,10 @@ function parse_opts
                 ;;
             -e|--virtual-env)
                 venv="${2}"
+                shift 2
+                ;;
+            --postgresql-version)
+                postgresql_version="${2}"
                 shift 2
                 ;;
             --postgresql-root)
