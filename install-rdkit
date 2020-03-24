@@ -126,8 +126,7 @@ function main
     sudo apt-get install -y \
         wget build-essential cmake libboost-dev libboost-python-dev \
         libboost-regex-dev libboost-system-dev libboost-thread-dev \
-        libboost-serialization-dev rdkit-data sqlite3 libsqlite3-dev \
-        openbabel libboost-iostreams-dev
+        libboost-serialization-dev libboost-iostreams-dev
     check_err $? 'Could not install required system packages.'
 
     if [[ $build_psql == ON ]]
@@ -140,33 +139,25 @@ function main
         3.8)
             debug "Installing Python ${python_version} packages..."
             sudo apt-get install -y \
-                python3.8 python3.8-dev python3-apt python3-numpy \
-                python3-scipy python3-matplotlib python3-pandas python3-sympy \
-                python3-nose
+                python3.8 python3.8-dev python3-numpy
             check_err $? 'Could not install required system packages.'
             ;;
         3.7)
             debug "Installing Python ${python_version} packages..."
             sudo apt-get install -y \
-                python3.7 python3.7-dev python3-apt python3-numpy \
-                python3-scipy python3-matplotlib python3-pandas python3-sympy \
-                python3-nose
+                python3.7 python3.7-dev python3-numpy
             check_err $? 'Could not install required system packages.'
             ;;
         3.6)
             debug "Installing Python ${python_version} packages..."
             sudo apt-get install -y \
-                python3.6 python3.6-dev python3-apt python3-numpy \
-                python3-scipy python3-matplotlib python3-pandas python3-sympy \
-                python3-nose
+                python3.6 python3.6-dev python3-numpy
             check_err $? 'Could not install required system packages.'
             ;;
         2.7)
             debug "Installing Python ${python_version} packages..."
             sudo apt-get install -y \
-                python2.7 python2.7-dev python-apt python-numpy \
-                python-scipy python-matplotlib python-pandas python-sympy \
-                python-nose
+                python2.7 python2.7-dev python-numpy
             check_err $? 'Could not install required system packages.'
             ;;
     esac
