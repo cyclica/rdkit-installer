@@ -2,10 +2,6 @@
 
 function main
 {
-    start_dir="${PWD}"
-    command_dir="$(cd "$(dirname $0)" && pwd)"
-    cd "${command_dir}"/../
-    project_dir="${PWD}"
     default_release=Release_2018_09_1
     default_python_version=3.6
 
@@ -38,8 +34,6 @@ function main
     esac
 
     debug "Initial install dir path: ${install_dir}"
-
-    cd "${start_dir}"
 
     if [ -z "${venv}" ]
     then
