@@ -277,7 +277,7 @@ function main
     echo 'PYTHONPATH=$RDBASE:$PYTHONPATH'
     echo 'export PYTHONPATH'
 
-    if [ ! -z "${postgresql_root}" ]
+    if [[ $build_psql == ON ]]
     then
         echo
         echo
