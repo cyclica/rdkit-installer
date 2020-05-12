@@ -97,6 +97,14 @@ function main
         fi
     fi
 
+    if [ -z "${boost_version}" ]
+    then
+        if [[ "$(lsb_release -rs)" == '20.04' ]]
+        then
+            boost_version=1.67
+        fi
+    fi
+
     if [ ! -d "${install_dir}" ]
     then
         mkdir -p "${install_dir}"
@@ -117,10 +125,18 @@ function main
     echo 'Installing required system packages. Enter your password if you are prompted.'
     echo
 
+    #
+    # We used to install only the following libboost packages: libboost-dev
+    # libboost-python-dev libboost-regex-dev libboost-system-dev
+    # libboost-thread-dev libboost-serialization-dev libboost-iostreams-dev.
+    # Those seem to be all it needs.
+    #
+    # The official RDKit docker image only installs libboost-all-dev (which
+    # installs the above list and more), so we switched to that
+    # (https://github.com/rdkit/rdkit_containers/blob/master/docker/ubuntu_bionic/Dockerfile).
+    #
     sudo apt-get install -y \
-        wget build-essential cmake libboost-dev libboost-python-dev \
-        libboost-regex-dev libboost-system-dev libboost-thread-dev \
-        libboost-serialization-dev libboost-iostreams-dev
+        wget build-essential cmake "libboost${boost_version}-all-dev"
     check_err $? 'Could not install required system packages.'
 
     if [[ $build_psql == ON ]]
@@ -361,6 +377,18 @@ function print_help
 		        --postgresql-version is specified. Defaults to
 		        /usr/lib/postgresql/POSTGRESQL_VERSION.
 		
+		    -b, --boost-version
+		        The version of libboost system packages you wish to install. By
+		        default the most likely compatible boost version in your
+		        current version of Ubuntu is used. If you see boost errors
+		        during the build it may be because the RDKit version you chose
+		        does not work with the boost version. See your package manager
+		        to find out which boost versions are available.
+		    
+		        Set this to the version number you see in the libboost-all-dev
+		        package name, ie. if you have libboost1.62-all-dev available,
+		        set this to 1.62 to use those libboost packages.
+		
 		    -c WHEN, --color=WHEN
 		        Colorize the output. WHEN can be 'always', 'auto' (default if
 		        omitted), or 'never'. With 'auto' it emits color codes only
@@ -390,6 +418,10 @@ function print_help
 		    # with PostgreSQL cartridge built for PostgreSQL 10 with custom
 		    # PostgreSQL dir.
 		    install-rdkit --postgresql-version=10 --postgresql-root=/postgresql-10 /path/to/install/dir
+		
+		    # Download and compile Release_2018_09_1 in /path/to/install/dir
+		    # libboost 1.65.
+		    install-rdkit --boost-version=1.65 /path/to/install/dir
 	EOF
 }
 
@@ -418,8 +450,8 @@ function parse_opts
     #   OPTIONS=s:dt
     #   LONGOPTS=source:,debug,test
     #
-    OPTIONS=c:r:p:e:dh
-    LONGOPTS=color:,release:,python-version:,virtual-env:,postgresql-version:,postgresql-root:,debug,help
+    OPTIONS=r:p:e:b:c:dh
+    LONGOPTS=release:,python-version:,virtual-env:,postgresql-version:,postgresql-root:,boost-version:,color:,debug,help
 
     # Use ! and PIPESTATUS to get exit code with errexit set.
     # Temporarily store output to be able to check for errors.
@@ -470,6 +502,10 @@ function parse_opts
                 ;;
             --postgresql-root)
                 postgresql_root="${2}"
+                shift 2
+                ;;
+            -b|--boost-version)
+                boost_version="${2}"
                 shift 2
                 ;;
             -c|--color)
