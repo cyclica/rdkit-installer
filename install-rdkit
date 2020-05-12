@@ -4,7 +4,6 @@ function main
 {
     default_release=Release_2018_09_1
 
-
     parse_opts "${@}"
 
 
@@ -28,7 +27,7 @@ function main
                 default_python_version=3.6
                 ;;
             *)
-                die "This installer doees not currently support Ubuntu $(lsb_release -rs). Specify the correct python-version and possibly boost-version to use this Ubuntu version."
+                die "This installer does not currently support Ubuntu $(lsb_release -rs). Specify the correct python-version and possibly boost-version to use this Ubuntu version."
                 ;;
         esac
 
@@ -361,7 +360,9 @@ function print_help
 		        Release_2018_09_1, Cyclica’s standard RDKit release.
 		
 		    -p, --python-version
-		        Version of Python to build for. Defaults to 3.6. Currently
+		        Version of Python to build for. Defaults to current Python 3
+		        version for supported Ubuntu releases. Exits with an error if
+		        not specified and Ubuntu release is unsupported. Currently
 		        supports 2.7, 3.6, 3.7, and 3.8.
 		
 		    -e, --virtual-env
