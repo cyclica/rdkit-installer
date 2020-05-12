@@ -26,6 +26,9 @@ function main
             18.04)
                 default_python_version=3.6
                 ;;
+            16.04)
+                default_python_version=2.7
+                ;;
             *)
                 die "This installer does not currently support Ubuntu $(lsb_release -rs). Specify the correct python-version and possibly boost-version to use this Ubuntu version."
                 ;;
@@ -340,14 +343,14 @@ function print_help
 		    install-rdkit will attempt to create it. WARNING: Anything in this
 		    directory will be deleted.
 		
-		    To use the version of RDKit this installs you must set some environment
-		    variables. You can do those manually. You can put them in your ~/.profile
-		    file to have them set automatically each time you open a new shell. You can
-		    also put them in a file like rdkit-env and run source rdkit-env each
-		    time you want to use it.
+		    To use the version of RDKit this installs you must set some
+		    environment variables. You can do those manually. You can put them
+		    in your ~/.profile file to have them set automatically each time
+		    you open a new shell. You can also put them in a file like
+		    rdkit-env and run source rdkit-env each time you want to use it.
 		
-		    If your INSTALL_DIR is /path/to/install/dir, set the following environment
-		    variables.
+		    If your INSTALL_DIR is /path/to/install/dir, set the following
+		    environment variables.
 		
 		    Note that RDKit will function if you do not export RDBASE, but it
 		    will be operating in a fallback mode and may have issues.
@@ -367,9 +370,9 @@ function print_help
 		
 		    -p, --python-version
 		        Version of Python to build for. Defaults to current Python 3
-		        version for supported Ubuntu releases. Exits with an error if
-		        not specified and Ubuntu release is unsupported. Currently
-		        supports 2.7, 3.6, 3.7, and 3.8.
+		        version for supported Ubuntu releases (2.7 for Ubuntu 16.04).
+		        Exits with an error if not specified and Ubuntu release is
+		        unsupported. Currently supports 2.7, 3.6, 3.7, and 3.8.
 		
 		    -e, --virtual-env
 		        Path to the Python virtual environment you want to run this

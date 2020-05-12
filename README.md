@@ -6,7 +6,8 @@ also install RDKit in a Python virtual environment.
 
 Currently works with Python 2.7, 3.6, 3.7, and 3.8.
 
-Tested on Ubuntu 16.04 and 18.04. It might work on Debian Linux.
+Tested on Ubuntu 16.04, 18.04, and 20.04, and RDKit release tags
+`Release_2018_09_1` to `Release_2020_03_1`.
 
 
 ## Usage ##
