@@ -4,12 +4,17 @@ function main
 {
     default_release=Release_2018_09_1
 
-    if [[ "$(lsb_release -rs)" == '20.04' ]]
-    then
-        default_python_version=3.8
-    else
-        default_python_version=3.6
-    fi
+    case "$(lsb_release -rs)" in
+        20.04)
+            default_python_version=3.8
+            ;;
+        18.04)
+            default_python_version=3.6
+            ;;
+        *)
+            die "This installer doees not currently support Ubuntu $(lsb_release -rs)"
+            ;;
+    esac
 
 
     parse_opts "${@}"
