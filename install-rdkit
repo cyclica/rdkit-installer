@@ -232,6 +232,7 @@ function main
                 -D RDK_BUILD_INCHI_SUPPORT=ON \
                 -D RDK_BUILD_PGSQL="${build_psql}" \
                 -D PostgreSQL_ROOT="${postgresql_root}" ..
+            check_err $? 'ERROR: cmake failed. See output above for details.'
             ;;
         3.7)
             debug "Running cmake for Python ${python_version}..."
@@ -246,6 +247,7 @@ function main
                 -D RDK_BUILD_INCHI_SUPPORT=ON \
                 -D RDK_BUILD_PGSQL="${build_psql}" \
                 -D PostgreSQL_ROOT="${postgresql_root}" ..
+            check_err $? 'ERROR: cmake failed. See output above for details.'
             ;;
         3.6)
             debug "Running cmake for Python ${python_version}..."
@@ -260,17 +262,21 @@ function main
                 -D RDK_BUILD_INCHI_SUPPORT=ON \
                 -D RDK_BUILD_PGSQL="${build_psql}" \
                 -D PostgreSQL_ROOT="${postgresql_root}" ..
+            check_err $? 'ERROR: cmake failed. See output above for details.'
             ;;
         2.7)
             debug "Running cmake for Python ${python_version}..."
             cmake -D RDK_BUILD_INCHI_SUPPORT=ON \
                   -D RDK_BUILD_PGSQL="${build_psql}" ..
+            check_err $? 'ERROR: cmake failed. See output above for details.'
             ;;
     esac
 
     cpu_cores="$(cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l)"
     make -j $cpu_cores
+    check_err $? 'ERROR: make failed. See output above for details.'
     make install
+    check_err $? 'ERROR: make install failed. See output above for details.'
 
     if [[ $build_psql == ON ]]
     then
