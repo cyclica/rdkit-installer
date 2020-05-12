@@ -3,7 +3,13 @@
 function main
 {
     default_release=Release_2018_09_1
-    default_python_version=3.6
+
+    if [[ "$(lsb_release -rs)" == '20.04' ]]
+    then
+        default_python_version=3.8
+    else
+        default_python_version=3.6
+    fi
 
 
     parse_opts "${@}"
