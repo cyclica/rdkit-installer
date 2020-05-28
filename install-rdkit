@@ -377,8 +377,12 @@ function print_help
 		    -e, --virtual-env
 		        Path to the Python virtual environment you want to run this
 		        installation of RDKit in. If you have a virtual environment
-		        activated it will default to that. It will ensure the virtual
-		        environment has numpy installed.
+		        activated it will default to that.
+		
+		        If the virtual environment does not already have numpy the
+		        latest version will be installed. If whatever you are using
+		        RDKit with uses numpy you should install its required version
+		        in the virtual environment before running this installer.
 		
 		    --postgresql-version
 		        Set this to the major version of PostgreSQL you have installed
