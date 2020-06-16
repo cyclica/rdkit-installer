@@ -142,7 +142,7 @@ function main
     # We used to install only the following libboost packages: libboost-dev
     # libboost-python-dev libboost-regex-dev libboost-system-dev
     # libboost-thread-dev libboost-serialization-dev libboost-iostreams-dev.
-    # Those seem to be all it needs.
+    # Those seem to be all it needs. It may not need libboost-iostreams-dev.
     #
     # The official RDKit docker image only installs libboost-all-dev (which
     # installs the above list and more), so we switched to that
