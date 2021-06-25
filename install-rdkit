@@ -200,7 +200,7 @@ function main
 
 
     echo
-    echo 'Extracting the archive to the install_dir directory...'
+    echo "Extracting the archive to the ${install_dir} directory..."
     echo
 
     tar -xzf "${release}.tar.gz" -C "${tmpdir}"
