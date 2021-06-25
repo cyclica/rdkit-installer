@@ -22,12 +22,15 @@ function main
         case "$(lsb_release -rs)" in
             20.04)
                 default_python_version=3.8
+                freetype_apt_package=libfreetype-dev
                 ;;
             18.04)
                 default_python_version=3.6
+                freetype_apt_package=libfreetype6-dev
                 ;;
             16.04)
                 default_python_version=2.7
+                freetype_apt_package=libfreetype6-dev
                 ;;
             *)
                 die "This installer does not currently support Ubuntu $(lsb_release -rs). Specify the correct python-version and possibly boost-version to use this Ubuntu version."
@@ -149,7 +152,7 @@ function main
     # (https://github.com/rdkit/rdkit_containers/blob/master/docker/ubuntu_bionic/Dockerfile).
     #
     sudo apt-get install -y \
-        wget build-essential cmake "libboost${boost_version}-all-dev"
+        wget build-essential cmake "libboost${boost_version}-all-dev" ${freetype_apt_package}
     check_err $? 'Could not install required system packages.'
 
     if [[ $build_psql == ON ]]
