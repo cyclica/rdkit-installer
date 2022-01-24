@@ -57,7 +57,7 @@ function main
             freetype_apt_package=libfreetype6-dev
             ;;
         *)
-            die "This installer does not currently support Ubuntu $(lsb_release -rs). Specify the correct python-version and possibly boost-version to use this Ubuntu version."
+            freetype_apt_package=libfreetype-dev
             ;;
     esac
 
