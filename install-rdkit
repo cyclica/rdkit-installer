@@ -223,12 +223,14 @@ function main
     rm -rf "${install_dir}"/{*,.[!.]*}
     mv ${tmpdir}/rdkit-${release}/{*,.[!.]*} "${install_dir}"
 
-    # Patch font checksum in CMakeList.txt for Release_2021_09_4
-    if [ "${release}" == 'Release_2021_09_4' ]
-    then
-        echo "Patching font checksum in CMakeList.txt"
-        sed -i 's/23ed3f833c1ae0adb141a26b4a30d73e/850b0df852f1cda4970887b540f8f333/g' "${install_dir}/Code/GraphMol/MolDraw2D/CMakeLists.txt"
-    fi
+    # The checksum for a font file the installer downloads changed at some
+    # point. We search for the old checksum and replace it with the new one if
+    # it is found. When the checksum of this file changed it broke a long list
+    # of RDKit versions. It should be fixed in Release_2021_09_5, and this
+    # patch will let us install any of the broken versions if we need to.
+    echo
+    echo "Ensuring font checksum in CMakeList.txt is correct..."
+    sed -i 's/23ed3f833c1ae0adb141a26b4a30d73e/850b0df852f1cda4970887b540f8f333/g' "${install_dir}/Code/GraphMol/MolDraw2D/CMakeLists.txt"
 
     # Add PostgreSQL 12 to CMake’s allowed versions. These were added to CMake
     # shortly after Ubuntu 18.04’s version.
