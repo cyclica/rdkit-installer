@@ -22,15 +22,12 @@ function main
         case "$(lsb_release -rs)" in
             20.04)
                 default_python_version=3.8
-                freetype_apt_package=libfreetype-dev
                 ;;
             18.04)
                 default_python_version=3.6
-                freetype_apt_package=libfreetype6-dev
                 ;;
             16.04)
                 default_python_version=2.7
-                freetype_apt_package=libfreetype6-dev
                 ;;
             *)
                 die "This installer does not currently support Ubuntu $(lsb_release -rs). Specify the correct python-version and possibly boost-version to use this Ubuntu version."
@@ -46,6 +43,21 @@ function main
             ;;
         *)
             die "ERROR: Invalid or unsupported Python version: ${python_version}"
+            ;;
+    esac
+
+    case "$(lsb_release -rs)" in
+        20.04)
+            freetype_apt_package=libfreetype-dev
+            ;;
+        18.04)
+            freetype_apt_package=libfreetype6-dev
+            ;;
+        16.04)
+            freetype_apt_package=libfreetype6-dev
+            ;;
+        *)
+            freetype_apt_package=libfreetype-dev
             ;;
     esac
 
@@ -210,6 +222,15 @@ function main
     # Clean out install directory
     rm -rf "${install_dir}"/{*,.[!.]*}
     mv ${tmpdir}/rdkit-${release}/{*,.[!.]*} "${install_dir}"
+
+    # The checksum for a font file the installer downloads changed at some
+    # point. We search for the old checksum and replace it with the new one if
+    # it is found. When the checksum of this file changed it broke a long list
+    # of RDKit versions. It should be fixed in Release_2021_09_5, and this
+    # patch will let us install any of the broken versions if we need to.
+    echo
+    echo "Ensuring font checksum in CMakeList.txt is correct..."
+    sed -i 's/23ed3f833c1ae0adb141a26b4a30d73e/850b0df852f1cda4970887b540f8f333/g' "${install_dir}/Code/GraphMol/MolDraw2D/CMakeLists.txt"
 
     # Add PostgreSQL 12 to CMake’s allowed versions. These were added to CMake
     # shortly after Ubuntu 18.04’s version.
