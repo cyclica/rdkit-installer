@@ -177,44 +177,44 @@ function main
     # installs the above list and more), so we switched to that
     # (https://github.com/rdkit/rdkit_containers/blob/master/docker/ubuntu_bionic/Dockerfile).
     #
-    sudo apt-get install -y \
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
         wget build-essential cmake "libboost${boost_version}-all-dev" ${freetype_apt_package} ${catch2_apt_package}
     check_err $? 'Could not install required system packages.'
 
     if [[ $build_psql == ON ]]
     then
-        sudo apt-get install -y postgresql-server-dev-${postgresql_version}
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql-server-dev-${postgresql_version}
     fi
     check_err $? 'Could not install required system packages.'
 
     case "${python_version}" in
         3.10)
             debug "Installing Python ${python_version} packages..."
-            sudo apt-get install -y \
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
                 python3.10 python3.10-dev python3-numpy
             check_err $? 'Could not install required system packages.'
             ;;
         3.8)
             debug "Installing Python ${python_version} packages..."
-            sudo apt-get install -y \
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
                 python3.8 python3.8-dev python3-numpy
             check_err $? 'Could not install required system packages.'
             ;;
         3.7)
             debug "Installing Python ${python_version} packages..."
-            sudo apt-get install -y \
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
                 python3.7 python3.7-dev python3-numpy
             check_err $? 'Could not install required system packages.'
             ;;
         3.6)
             debug "Installing Python ${python_version} packages..."
-            sudo apt-get install -y \
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
                 python3.6 python3.6-dev python3-numpy
             check_err $? 'Could not install required system packages.'
             ;;
         2.7)
             debug "Installing Python ${python_version} packages..."
-            sudo apt-get install -y \
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
                 python2.7 python2.7-dev python-numpy
             check_err $? 'Could not install required system packages.'
             ;;
