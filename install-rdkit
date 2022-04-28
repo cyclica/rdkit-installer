@@ -42,7 +42,7 @@ function main
     fi
 
     case "${python_version}" in
-        2.7|3.6|3.7|3.8|3.10)
+        2.7|3.6|3.7|3.8|3.9|3.10)
             ;;
         *)
             die "ERROR: Invalid or unsupported Python version: ${python_version}"
@@ -136,9 +136,6 @@ function main
         if [[ "$(lsb_release -rs)" == '20.04' ]]
         then
             boost_version=1.67
-        elif [[ "$(lsb_release -rs)" == '22.04' ]]
-        then
-            boost_version=1.74
         fi
     fi
 
