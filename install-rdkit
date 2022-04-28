@@ -20,9 +20,9 @@ function main
     if [ -z "${python_version}" ]
     then
         case "$(lsb_release -rs)" in
-	    22.04)
-		default_python_version=3.10
-		;;
+            22.04)
+                default_python_version=3.10
+                ;;
             20.04)
                 default_python_version=3.8
                 ;;
@@ -50,9 +50,9 @@ function main
     esac
 
     case "$(lsb_release -rs)" in
-	22.04)
-	    freetype_apt_package=libfreetype-dev
-	    ;;
+        22.04)
+            freetype_apt_package=libfreetype-dev
+            ;;
         20.04)
             freetype_apt_package=libfreetype-dev
             ;;
@@ -137,8 +137,8 @@ function main
         then
             boost_version=1.67
         elif [[ "$(lsb_release -rs)" == '22.04' ]]
-	then
-	    boost_version=1.74
+        then
+            boost_version=1.74
         fi
     fi
 
@@ -286,10 +286,10 @@ function main
             # Based on the advanced install instructions in the RDKit online
             # docs with paths changed to match Ubuntu Linux file locations:
             # https://www.rdkit.org/docs/Install.html#advanced
-	    #
-	    # rdkit ships with a version of catch2 that is broken on ubuntu
-	    # 22.04, so in a python 3.10 install we override to use the system
-	    # copy
+            #
+            # rdkit ships with a version of catch2 that is broken on ubuntu
+            # 22.04, so in a python 3.10 install we override to use the system
+            # copy
 
             cmake -D PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.10.so \
                 -D PYTHON_INCLUDE_DIR=/usr/include/python3.10 \
