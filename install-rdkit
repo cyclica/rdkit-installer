@@ -49,9 +49,17 @@ function main
             ;;
     esac
 
+    freetype_apt_package=''
+    catch2_apt_package=''
+    cmake_catch_option=''
     case "$(lsb_release -rs)" in
         22.04)
             freetype_apt_package=libfreetype-dev
+
+            # RDKit ships with a version of catch2 that is broken in Ubuntu
+            # 22.04, so we tell cmake to use the system copy.
+            catch2_apt_package=catch2
+            cmake_catch_option='-D CATCH_DIR=/usr/include/catch2'
             ;;
         20.04)
             freetype_apt_package=libfreetype-dev
@@ -137,14 +145,6 @@ function main
         then
             boost_version=1.67
         fi
-    fi
-
-    # if under ubuntu 22.04, we need to install and use catch2
-    if [[ "$(lsb_release -rs)" == '22.04' ]]
-    then
-        catch2_apt_package=catch2
-    else
-        catch2_apt_package=''
     fi
 
     if [ ! -d "${install_dir}" ]
@@ -282,16 +282,14 @@ function main
             # docs with paths changed to match Ubuntu Linux file locations:
             # https://www.rdkit.org/docs/Install.html#advanced
             #
-            # rdkit ships with a version of catch2 that is broken on ubuntu
-            # 22.04, so in a python 3.10 install we override to use the system
-            # copy
-
+            # Ubuntu 22.04 only has (as of launch) Python 3.10, so we start
+            # adding the catch option here.
             cmake -D PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.10.so \
                 -D PYTHON_INCLUDE_DIR=/usr/include/python3.10 \
                 -D PYTHON_EXECUTABLE=/usr/bin/python3.10 \
                 $numpy_cmake_option \
                 -D RDK_BUILD_INCHI_SUPPORT=ON \
-                -D CATCH_DIR=/usr/include/catch2 \
+                $cmake_catch_option \
                 -D RDK_BUILD_PGSQL="${build_psql}" \
                 -D PostgreSQL_TYPE_INCLUDE_DIR="/usr/include/postgresql/${postgresql_version}/server" \
                 -D PostgreSQL_ROOT="${postgresql_root}" ..
