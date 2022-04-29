@@ -228,8 +228,6 @@ function main
     tmpdir="$(mktemp -d)"
     cd "${tmpdir}"
 
-    archive_url="https://github.com/rdkit/rdkit/archive/${release}.tar.gz"
-
     wget "https://github.com/rdkit/rdkit/archive/${release}.tar.gz"
     check_err $? 'RDKit release could not be downloaded.'
 
