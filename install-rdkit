@@ -59,6 +59,7 @@ function main
             # RDKit ships with a version of catch2 that is broken in Ubuntu
             # 22.04, so we tell cmake to use the system copy.
             catch2_apt_package=catch2
+            # This option is added to the cmake call below.
             cmake_catch_option='-D CATCH_DIR=/usr/include/catch2'
             ;;
         20.04)
@@ -257,78 +258,43 @@ function main
     debug "Current directory for build: ${PWD}"
 
     case "${python_version}" in
-        3.10)
+        2.7)
+            debug "Running cmake for Python ${python_version}..."
+            cmake -D RDK_BUILD_INCHI_SUPPORT=ON \
+                  -D RDK_BUILD_PGSQL="${build_psql}" ..
+            check_err $? 'ERROR: cmake failed. See output above for details.'
+            ;;
+        3.6|3.7)
             debug "Running cmake for Python ${python_version}..."
             debug "numpy_cmake_option: $numpy_cmake_option"
             # Based on the advanced install instructions in the RDKit online
             # docs with paths changed to match Ubuntu Linux file locations:
             # https://www.rdkit.org/docs/Install.html#advanced
-            #
-            # Ubuntu 22.04 only has (as of launch) Python 3.10, so we start
-            # adding the catch option here.
-            cmake -D PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.10.so \
-                -D PYTHON_INCLUDE_DIR=/usr/include/python3.10 \
-                -D PYTHON_EXECUTABLE=/usr/bin/python3.10 \
+            cmake -D PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython${python_version}m.so \
+                -D PYTHON_INCLUDE_DIR=/usr/include/python${python_version}m \
+                -D PYTHON_EXECUTABLE=/usr/bin/python${python_version} \
+                $numpy_cmake_option \
+                -D RDK_BUILD_INCHI_SUPPORT=ON \
+                -D RDK_BUILD_PGSQL="${build_psql}" \
+                -D PostgreSQL_TYPE_INCLUDE_DIR="/usr/include/postgresql/${postgresql_version}/server" \
+                -D PostgreSQL_ROOT="${postgresql_root}" ..
+            check_err $? 'ERROR: cmake failed. See output above for details.'
+            ;;
+        *)
+            debug "Running cmake for Python ${python_version}..."
+            debug "numpy_cmake_option: $numpy_cmake_option"
+            # Based on the advanced install instructions in the RDKit online
+            # docs with paths changed to match Ubuntu Linux file locations:
+            # https://www.rdkit.org/docs/Install.html#advanced
+            cmake -D PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython${python_version}.so \
+                -D PYTHON_INCLUDE_DIR=/usr/include/python${python_version} \
+                -D PYTHON_EXECUTABLE=/usr/bin/python${python_version} \
                 $numpy_cmake_option \
                 -D RDK_BUILD_INCHI_SUPPORT=ON \
                 $cmake_catch_option \
                 -D RDK_BUILD_PGSQL="${build_psql}" \
                 -D PostgreSQL_TYPE_INCLUDE_DIR="/usr/include/postgresql/${postgresql_version}/server" \
                 -D PostgreSQL_ROOT="${postgresql_root}" ..
-            check_err $? 'ERROR: cmake failed. See output above for details.'
-            ;;
-        3.8)
-            debug "Running cmake for Python ${python_version}..."
-            debug "numpy_cmake_option: $numpy_cmake_option"
-            # Based on the advanced install instructions in the RDKit online
-            # docs with paths changed to match Ubuntu Linux file locations:
-            # https://www.rdkit.org/docs/Install.html#advanced
-            cmake -D PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.8.so \
-                -D PYTHON_INCLUDE_DIR=/usr/include/python3.8 \
-                -D PYTHON_EXECUTABLE=/usr/bin/python3.8 \
-                $numpy_cmake_option \
-                -D RDK_BUILD_INCHI_SUPPORT=ON \
-                -D RDK_BUILD_PGSQL="${build_psql}" \
-                -D PostgreSQL_TYPE_INCLUDE_DIR="/usr/include/postgresql/${postgresql_version}/server" \
-                -D PostgreSQL_ROOT="${postgresql_root}" ..
-            check_err $? 'ERROR: cmake failed. See output above for details.'
-            ;;
-        3.7)
-            debug "Running cmake for Python ${python_version}..."
-            debug "numpy_cmake_option: $numpy_cmake_option"
-            # Based on the advanced install instructions in the RDKit online
-            # docs with paths changed to match Ubuntu Linux file locations:
-            # https://www.rdkit.org/docs/Install.html#advanced
-            cmake -D PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.7m.so \
-                -D PYTHON_INCLUDE_DIR=/usr/include/python3.7m \
-                -D PYTHON_EXECUTABLE=/usr/bin/python3.7 \
-                $numpy_cmake_option \
-                -D RDK_BUILD_INCHI_SUPPORT=ON \
-                -D RDK_BUILD_PGSQL="${build_psql}" \
-                -D PostgreSQL_TYPE_INCLUDE_DIR="/usr/include/postgresql/${postgresql_version}/server" \
-                -D PostgreSQL_ROOT="${postgresql_root}" ..
-            check_err $? 'ERROR: cmake failed. See output above for details.'
-            ;;
-        3.6)
-            debug "Running cmake for Python ${python_version}..."
-            debug "numpy_cmake_option: $numpy_cmake_option"
-            # Based on the advanced install instructions in the RDKit online
-            # docs with paths changed to match Ubuntu Linux file locations:
-            # https://www.rdkit.org/docs/Install.html#advanced
-            cmake -D PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so \
-                -D PYTHON_INCLUDE_DIR=/usr/include/python3.6m \
-                -D PYTHON_EXECUTABLE=/usr/bin/python3.6 \
-                $numpy_cmake_option \
-                -D RDK_BUILD_INCHI_SUPPORT=ON \
-                -D RDK_BUILD_PGSQL="${build_psql}" \
-                -D PostgreSQL_TYPE_INCLUDE_DIR="/usr/include/postgresql/${postgresql_version}/server" \
-                -D PostgreSQL_ROOT="${postgresql_root}" ..
-            check_err $? 'ERROR: cmake failed. See output above for details.'
-            ;;
-        2.7)
-            debug "Running cmake for Python ${python_version}..."
-            cmake -D RDK_BUILD_INCHI_SUPPORT=ON \
-                  -D RDK_BUILD_PGSQL="${build_psql}" ..
             check_err $? 'ERROR: cmake failed. See output above for details.'
             ;;
     esac
