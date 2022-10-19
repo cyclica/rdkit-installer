@@ -178,8 +178,9 @@ function main
     # installs the above list and more), so we switched to that
     # (https://github.com/rdkit/rdkit_containers/blob/master/docker/ubuntu_bionic/Dockerfile).
     #
+    # libxrender1 is needed by RDKit for some operations.
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        wget build-essential cmake "libboost${boost_version}-all-dev" ${freetype_apt_package} ${catch2_apt_package}
+        wget build-essential cmake "libboost${boost_version}-all-dev" ${freetype_apt_package} ${catch2_apt_package} libxrender1
     check_err $? 'Could not install required system packages.'
 
     if [[ $build_psql == ON ]]
