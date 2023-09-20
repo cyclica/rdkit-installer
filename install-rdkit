@@ -4,6 +4,14 @@ function main
 {
     default_release=Release_2018_09_1
 
+    cpu_arch="$(lscpu | grep Architecture | grep -Eo '[^ ]*$')"
+    if [ -z "${cpu_arch}" ]
+    then
+        # "service unavailable" error in /usr/include/sysexits.h.
+        die 'Could not determine CPU architecture.' 69
+    fi
+    debug "cpu_arch: ${cpu_arch}"
+
     parse_opts "${@}"
 
 
@@ -271,7 +279,7 @@ function main
             # Based on the advanced install instructions in the RDKit online
             # docs with paths changed to match Ubuntu Linux file locations:
             # https://www.rdkit.org/docs/Install.html#advanced
-            cmake -D PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython${python_version}m.so \
+            cmake -D PYTHON_LIBRARY=/usr/lib/${cpu_arch}-linux-gnu/libpython${python_version}m.so \
                 -D PYTHON_INCLUDE_DIR=/usr/include/python${python_version}m \
                 -D PYTHON_EXECUTABLE=/usr/bin/python${python_version} \
                 $numpy_cmake_option \
@@ -287,7 +295,7 @@ function main
             # Based on the advanced install instructions in the RDKit online
             # docs with paths changed to match Ubuntu Linux file locations:
             # https://www.rdkit.org/docs/Install.html#advanced
-            cmake -D PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython${python_version}.so \
+            cmake -D PYTHON_LIBRARY=/usr/lib/${cpu_arch}-linux-gnu/libpython${python_version}.so \
                 -D PYTHON_INCLUDE_DIR=/usr/include/python${python_version} \
                 -D PYTHON_EXECUTABLE=/usr/bin/python${python_version} \
                 $numpy_cmake_option \
