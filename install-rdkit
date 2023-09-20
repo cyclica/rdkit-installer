@@ -2,7 +2,7 @@
 
 function main
 {
-    default_release=Release_2018_09_1
+    default_release=Release_2022_09_4
 
     cpu_arch="$(lscpu | grep Architecture | grep -Eo '[^ ]*$')"
     if [ -z "${cpu_arch}" ]
